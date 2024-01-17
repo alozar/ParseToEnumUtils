@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace ParseToEnumUtils;
 
@@ -29,28 +25,19 @@ public class ParseToEnumService
             // Обработка имени/описания
             var wordInd = Math.Max(splitTabArray[1].IndexOf(" "), Math.Max(splitTabArray[1].IndexOf("-"), splitTabArray[1].IndexOf("–")));
             var tableName = splitTabArray[1];
-            var description = splitTabArray[1];
             if (wordInd > 0)
             {
                 tableName = tableName.Substring(0, wordInd).Trim();
-                description = description.Substring(wordInd + 1, description.Length - wordInd - 1).Trim();
             }
 
             // Обрезаем имя
-            var tableNameParts = tableName.Split('.');
-            tableName = tableNameParts.Last();
-
-            // Обрезаем (R2)
-            var rInd = description.IndexOf("(R");
-            if (rInd > 0)
-            {
-                description = description.Substring(0, rInd).Trim();
-            }
+            var tableNameParts = tableName.Split('.').Last().ToLower().Split('_');
+            // Переводим в CamelCase
+            tableName = string.Join("", tableNameParts.Select(part => char.ToUpper(part[0]) + part.Substring(1)));
 
             result.AppendLine("/// <summary>");
             result.AppendLine($"/// {splitTabArray[1]}");
             result.AppendLine("/// </summary>");
-            result.AppendLine($"[Description(\"{description}\")]");
             result.Append($"{tableName} = {id}");
             result.AppendLine($"{(i == list.Count - 1 ? "" : ",")}");
             result.AppendLine();
